@@ -2,6 +2,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import { connectDatabase } from "./config/database";
+import apiRouter from "./routes/api";
 
 const app = express();
 
@@ -29,5 +30,8 @@ app.use("/api", async (_req, _res, next) => {
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, db: true });
 });
+
+app.use("/api", apiRouter);
+app.use("/", apiRouter);
 
 export default app;
