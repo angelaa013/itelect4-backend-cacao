@@ -1,20 +1,32 @@
 # PAWHOME Cacao Backend
 
-Express and TypeScript API for the PAWHOME pet adoption frontend. Mongoose connects the API to MongoDB Atlas and stores pets, adopters, and adoption requests in separate collections.
+Express and TypeScript API for the PAWHOME pet adoption project. It uses Mongoose to connect to MongoDB and stores pets, adopters, and adoption requests.
+
+## Live deployment
+
+- Backend base URL: https://itelect4-backend-cacao.vercel.app/
+- Health check: https://itelect4-backend-cacao.vercel.app/api/health
+- Pets: https://itelect4-backend-cacao.vercel.app/api/pets
+- Adopters: https://itelect4-backend-cacao.vercel.app/api/adopters
+- Adoption requests: https://itelect4-backend-cacao.vercel.app/api/requests
+
+The base URL returns a status message. List endpoints return JSON. For example, `/api/pets` returns an empty array when the MongoDB pets collection has no records.
 
 ## Requirements
 
-- Node.js 20+
+- Node.js 20 or later
 - npm
-- A MongoDB Atlas database or compatible MongoDB connection string
+- MongoDB Atlas or another MongoDB connection string
 
 ## Local setup
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-Copy `.env.example` to `.env` and set the values:
+Copy `.env.example` to `.env` and fill in your own values:
 
 ```env
 PORT=4000
@@ -23,22 +35,26 @@ JWT_SECRET=your_long_random_secret
 CORS_ORIGIN=http://localhost:5173
 ```
 
-Keep `.env` private and out of Git. `CORS_ORIGIN` may contain multiple comma-separated frontend origins. The API connects to MongoDB when an API request arrives.
+Keep `.env` private and do not commit it. For a deployed frontend, set `CORS_ORIGIN` to the frontend's exact origin (scheme and hostname, no path or trailing slash). Multiple allowed origins can be comma-separated.
 
 ## Run and build
+
+Start the local development server:
 
 ```bash
 npm run dev
 ```
 
-The development server listens on `http://localhost:4000` by default.
+It listens on `http://localhost:4000` by default.
+
+Build and run the compiled server:
 
 ```bash
 npm run build
 npm start
 ```
 
-Other available command:
+Type-check without emitting files:
 
 ```bash
 npm run typecheck
@@ -48,18 +64,26 @@ npm run typecheck
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `GET` | `/` | Basic backend status message. |
-| `GET` | `/api/health` | Database health response. |
-| `GET` | `/api/pets` | List pets. Returns an empty array when the `pets` collection has no records. |
-| `GET` | `/api/pets/:id` | Get one pet by numeric ID. |
-| `GET` | `/api/adopters` | List adopters. |
-| `GET` | `/api/requests` | List adoption requests, newest first. |
-| `POST` | `/api/requests` | Create an adoption request. Provide a JSON body with `adopterName` and either `petId` or `petName`; other adopter details are optional. |
+| GET | `/` | Backend status message. |
+| GET | `/api/health` | Database health check. |
+| GET | `/api/pets` | List pets from MongoDB. |
+| GET | `/api/pets/:id` | Get a pet by its positive numeric ID. |
+| GET | `/api/adopters` | List adopters from MongoDB. |
+| GET | `/api/requests` | List adoption requests, newest first. |
+| POST | `/api/requests` | Create an adoption request. |
 
-The API uses the `pets`, `adopters`, and `requests` MongoDB collections. Add records to those collections before expecting the list endpoints to return data.
+For `POST /api/requests`, send JSON with `adopterName` and either `petId` or `petName`. Optional fields include `adopterAddress`, `adopterContact`, `adopterGithub`, and `requestedDate`. A `petId` must match a pet already stored in MongoDB.
 
 ## Vercel deployment
 
-Import this repository as a Vercel project. Configure `MONGODB_URI` and `CORS_ORIGIN` in the project's Environment Variables. Set `CORS_ORIGIN` to the exact frontend origin, without a path or trailing slash. Redeploy after changing environment variables.
+Import this backend repository as its own Vercel project. Add these Environment Variables in Vercel:
 
-The Express application is exported from `src/app.ts` for Vercel; `src/server.ts` is the local development entry point.
+- `MONGODB_URI` — MongoDB connection string
+- `JWT_SECRET` — long random secret
+- `CORS_ORIGIN` — exact deployed frontend origin
+
+Redeploy after changing environment variables. The Vercel app entry is exported from `src/app.ts`; `src/server.ts` is used for local development.
+
+## Database note
+
+The API reads and writes MongoDB collections named `pets`, `adopters`, and `requests`. Add documents to the collections before expecting the list routes to show records. The frontend's sample data is separate from this database.
