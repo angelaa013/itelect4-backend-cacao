@@ -1,21 +1,21 @@
 import "dotenv/config";
-import express from "express";
-import cors from "cors";
 
-const app = express();
-const port = Number(process.env.PORT) || 4000;
+import app from "./app";
+import { connectDatabase } from "./config/database";
 
-app.use(cors());
-app.use(express.json());
+const port = Number(process.env.PORT || 4000);
 
-app.get("/", (_req, res) => {
-  res.json({ message: "Cacao backend is running" });
-});
+async function startServer(): Promise<void> {
+  try {
+    await connectDatabase();
 
-app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, db: true });
-});
+    app.listen(port, () => {
+      console.log(`API listening on http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+}
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+void startServer();
