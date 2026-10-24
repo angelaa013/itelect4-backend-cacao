@@ -30,8 +30,18 @@ router.post("/", aiLimiter, async (req, res) => {
   } catch (error) {
     console.error("AI review failed:", error);
 
+    const detail =
+      process.env.NODE_ENV === "production"
+        ? undefined
+        : error instanceof Error
+          ? error.message
+          : String(error);
+
     if (error instanceof AiReplyError) {
-      res.status(502).json({ error: "Gemini returned an unusable response." });
+      res.status(502).json({
+        error: "Gemini returned an unusable response.",
+        detail,
+      });
       return;
     }
 
@@ -39,11 +49,17 @@ router.post("/", aiLimiter, async (req, res) => {
       error instanceof Error &&
       error.message.includes("GEMINI_API_KEY is missing")
     ) {
-      res.status(500).json({ error: "The AI service is not configured." });
+      res.status(500).json({
+        error: "The AI service is not configured.",
+        detail,
+      });
       return;
     }
 
-    res.status(502).json({ error: "The AI service failed. Please try again." });
+    res.status(502).json({
+      error: "The AI service failed.",
+      detail,
+    });
   }
 });
 
