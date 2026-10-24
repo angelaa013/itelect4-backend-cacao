@@ -1,89 +1,121 @@
-# PAWHOME Cacao Backend
+# PAWHOME — Pet Adoption Platform
 
-Express and TypeScript API for the PAWHOME pet adoption project. It uses Mongoose to connect to MongoDB and stores pets, adopters, and adoption requests.
+PAWHOME is a pet adoption website where users can browse pets, view pet details, and submit adoption requests. It also includes an AI Project Review page that gives feedback on a project description.
 
-## Live deployment
+## Live application
 
-- Backend base URL: https://itelect4-backend-cacao.vercel.app/
-- Health check: https://itelect4-backend-cacao.vercel.app/api/health
-- Pets: https://itelect4-backend-cacao.vercel.app/api/pets
-- Adopters: https://itelect4-backend-cacao.vercel.app/api/adopters
-- Adoption requests: https://itelect4-backend-cacao.vercel.app/api/requests
+- **Frontend:** [https://itelect4-project-cacao-it-4-b.vercel.app/](https://itelect4-project-cacao-it-4-b.vercel.app/)
+- **Backend API:** [https://itelect4-backend-cacao.vercel.app/](https://itelect4-backend-cacao.vercel.app/)
+- **Backend health check:** [https://itelect4-backend-cacao.vercel.app/api/health](https://itelect4-backend-cacao.vercel.app/api/health)
 
-The base URL returns a status message. List endpoints return JSON. For example, `/api/pets` returns an empty array when the MongoDB pets collection has no records.
+Open the frontend homepage and use its navigation to visit **AI Review**.
 
-## Requirements
+## Source code
 
-- Node.js 20 or later
-- npm
-- MongoDB Atlas or another MongoDB connection string
+- **Frontend repository:** [itelect4-project-cacao-IT4B](https://github.com/angelaa013/itelect4-project-cacao-IT4B)
+- **Backend repository:** [itelect4-backend-cacao](https://github.com/angelaa013/itelect4-backend-cacao)
 
-## Local setup
+## Technologies
 
-Install dependencies:
+- React and TypeScript
+- Vite
+- Express and TypeScript
+- MongoDB with Mongoose
+- Google Gemini API
+
+## Features
+
+- Browse pets and view pet details
+- View adopters and adoption requests
+- Submit adoption requests
+- Describe a project and receive AI-generated strengths, improvements, and a readiness rating
+
+The frontend currently uses sample data from `src/data/mockData.ts` for its pet, adopter, and request pages. The AI Project Review feature sends its request to the backend API.
+
+## Run locally
+
+You need Node.js, npm, and a MongoDB connection string.
+
+### 1. Start the backend
+
+Clone the backend repository and install its dependencies:
 
 ```bash
+git clone https://github.com/angelaa013/itelect4-backend-cacao.git
+cd itelect4-backend-cacao
 npm install
 ```
 
-Copy `.env.example` to `.env` and fill in your own values:
+Create a `.env` file in the backend folder using `.env.example` as a guide:
 
 ```env
 PORT=4000
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_secret
 CORS_ORIGIN=http://localhost:5173
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Keep `.env` private and do not commit it. For a deployed frontend, set `CORS_ORIGIN` to the frontend's exact origin (scheme and hostname, no path or trailing slash). Multiple allowed origins can be comma-separated.
-
-## Run and build
-
-Start the local development server:
+Start the backend:
 
 ```bash
 npm run dev
 ```
 
-It listens on `http://localhost:4000` by default.
+Keep your `.env` file and API keys private. Do not commit them to GitHub.
 
-Build and run the compiled server:
+### 2. Start the frontend
 
-```bash
-npm run build
-npm start
-```
-
-Type-check without emitting files:
+In a separate terminal, clone the frontend repository and install its dependencies:
 
 ```bash
-npm run typecheck
+git clone https://github.com/angelaa013/itelect4-project-cacao-IT4B.git
+cd itelect4-project-cacao-IT4B
+npm install
 ```
+
+Create a `.env` file in the frontend folder:
+
+```env
+VITE_API_URL=
+VITE_USE_MOCK_DATA=false
+```
+
+Leave `VITE_API_URL` blank for local development. Vite will proxy API requests to the backend at `http://localhost:4000`.
+
+Start the frontend:
+
+```bash
+npm run dev
+```
+
+Open the local URL printed by Vite, usually `http://localhost:5173`.
 
 ## API routes
 
-| Method | Path | Description |
+| Method | Route | Purpose |
 | --- | --- | --- |
-| GET | `/` | Backend status message. |
-| GET | `/api/health` | Database health check. |
-| GET | `/api/pets` | List pets from MongoDB. |
-| GET | `/api/pets/:id` | Get a pet by its positive numeric ID. |
-| GET | `/api/adopters` | List adopters from MongoDB. |
-| GET | `/api/requests` | List adoption requests, newest first. |
-| POST | `/api/requests` | Create an adoption request. |
+| GET | `/api/health` | Check backend and database status |
+| GET | `/api/pets` | List pets |
+| GET | `/api/pets/:id` | Get a pet by ID |
+| GET | `/api/adopters` | List adopters |
+| GET | `/api/requests` | List adoption requests |
+| POST | `/api/requests` | Create an adoption request |
+| POST | `/api/ai` | Review a project description with Gemini |
 
-For `POST /api/requests`, send JSON with `adopterName` and either `petId` or `petName`. Optional fields include `adopterAddress`, `adopterContact`, `adopterGithub`, and `requestedDate`. A `petId` must match a pet already stored in MongoDB.
+## Deployment configuration
 
-## Vercel deployment
+In the **frontend Vercel project**, set:
 
-Import this backend repository as its own Vercel project. Add these Environment Variables in Vercel:
+```env
+VITE_API_URL=https://itelect4-backend-cacao.vercel.app
+VITE_USE_MOCK_DATA=false
+```
 
-- `MONGODB_URI` — MongoDB connection string
-- `JWT_SECRET` — long random secret
-- `CORS_ORIGIN` — exact deployed frontend origin
+In the **backend Vercel project**, configure `MONGODB_URI`, `JWT_SECRET`, `CORS_ORIGIN`, and `GEMINI_API_KEY`. Set `CORS_ORIGIN` to:
 
-Redeploy after changing environment variables. The Vercel app entry is exported from `src/app.ts`; `src/server.ts` is used for local development.
+```text
+https://itelect4-project-cacao-it-4-b.vercel.app
+```
 
-## Database note
-
-The API reads and writes MongoDB collections named `pets`, `adopters`, and `requests`. Add documents to the collections before expecting the list routes to show records. The frontend's sample data is separate from this database.
+Redeploy the relevant Vercel project after changing its environment variables.
