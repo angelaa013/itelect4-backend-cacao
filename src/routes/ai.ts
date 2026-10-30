@@ -2,6 +2,7 @@ import { Router } from "express";
 import { rateLimit } from "express-rate-limit";
 import { aiRequestSchema } from "../schemas/review";
 import { AiReplyError, reviewProject } from "../ai/gemini";
+import requireAuth from "../middleware/requireAuth";
 
 const router = Router();
 
@@ -12,6 +13,8 @@ const aiLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Too many AI review requests. Please wait a minute." },
 });
+
+router.use(requireAuth);
 
 router.post("/", aiLimiter, async (req, res) => {
   const parsed = aiRequestSchema.safeParse(req.body);
@@ -64,3 +67,4 @@ router.post("/", aiLimiter, async (req, res) => {
 });
 
 export default router;
+
