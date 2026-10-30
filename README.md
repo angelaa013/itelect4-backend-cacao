@@ -95,27 +95,26 @@ Open the local URL printed by Vite, usually `http://localhost:5173`.
 
 | Method | Route | Purpose |
 | --- | --- | --- |
-| GET | `/api/health` | Check backend and database status |
-| GET | `/api/pets` | List pets |
-| GET | `/api/pets/:id` | Get a pet by ID |
-| GET | `/api/adopters` | List adopters |
-| GET | `/api/requests` | List adoption requests |
-| POST | `/api/requests` | Create an adoption request |
-| POST | `/api/ai` | Review a project description with Gemini |
+| GET | `/` | Backend status message. |
+| GET | `/api/health` | Database health check. |
+| GET | `/api/pets` | List pets from MongoDB. |
+| GET | `/api/pets/:id` | Get a pet by its positive numeric ID. |
+| GET | `/api/adopters` | List adopters from MongoDB. |
+| GET | `/api/requests` | List adoption requests, newest first. |
+| POST | `/api/requests` | Create an adoption request. |
 
-## Deployment configuration
+For `POST /api/requests`, send JSON with `adopterName` and either `petId` or `petName`. Optional fields include `adopterAddress`, `adopterContact`, `adopterGithub`, and `requestedDate`. A `petId` must match a pet already stored in MongoDB.
 
-In the **frontend Vercel project**, set:
+## Vercel deployment
 
-```env
-VITE_API_URL=https://itelect4-backend-cacao.vercel.app
-VITE_USE_MOCK_DATA=false
-```
+Import this backend repository as its own Vercel project. Add these Environment Variables in Vercel:
 
-In the **backend Vercel project**, configure `MONGODB_URI`, `JWT_SECRET`, `CORS_ORIGIN`, and `GEMINI_API_KEY`. Set `CORS_ORIGIN` to:
+- `MONGODB_URI` — MongoDB connection string
+- `JWT_SECRET` — long random secret
+- `CORS_ORIGIN` — exact deployed frontend origin
 
-```text
-https://itelect4-project-cacao-it-4-b.vercel.app
-```
+Redeploy after changing environment variables. The Vercel app entry is exported from `src/app.ts`; `src/server.ts` is used for local development.
 
-Redeploy the relevant Vercel project after changing its environment variables.
+## Database note
+
+The API reads and writes MongoDB collections named `pets`, `adopters`, and `requests`. Add documents to the collections before expecting the list routes to show records. The frontend's sample data is separate from this database.
