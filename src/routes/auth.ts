@@ -2,8 +2,8 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 
 const router = Router();
-const DEMO_USERNAME = "student1";
-const DEMO_PASSWORD = "demo123";
+const DEMO_USERNAME = "Angela1";
+const DEMO_PASSWORD = "password123";
 
 // The current app uses mock credentials; this signs a server-side JWT so the
 // protected AI route can still verify the existing demo login flow.
@@ -34,4 +34,5 @@ router.post("/login", (req, res) => {
 });
 
 export default router;
+
 
